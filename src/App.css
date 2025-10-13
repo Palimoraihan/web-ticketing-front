@@ -1,0 +1,23 @@
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+
+.scroll-container:hover::-webkit-scrollbar {
+  background: transparent ;
+
+}
+
+.scroll-container:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3); 
+  border-radius: 4px;
+}
+.ant-card-body{
+    padding: 14px !important;
+}
+.custome-input,
+.custome-input:hover,
+.custome-input:focus {
+  cursor: text !important;
+  caret-color: black !important; /* warna kursor saat mengetik */
+}

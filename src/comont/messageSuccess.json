@@ -1,0 +1,48 @@
+{
+  "success": {
+    "auth": {
+      "login_success": {
+        "title": "Logged In Successfully",
+        "message": "Welcome back, {name}!"
+      },
+      "register_success": {
+        "title": "Account Created",
+        "message": "Your account has been successfully created. You can now log in."
+      },
+      "password_reset_success": {
+        "title": "Password Reset Successful",
+        "message": "Your password has been updated. Please log in with your new password."
+      },
+      "logout_success": {
+        "title": "Logged Out",
+        "message": "You have successfully logged out. See you next time!"
+      }
+    },
+    "resource": {
+      "create_success": {
+        "title": "Created Successfully",
+        "message": "{resource} has been added successfully."
+      },
+      "update_success": {
+        "title": "Updated Successfully",
+        "message": "{resource} has been updated successfully."
+      },
+      "delete_success": {
+        "title": "Deleted Successfully",
+        "message": "{resource} has been removed successfully."
+      }
+    },
+    "upload": {
+      "success": {
+        "title": "Upload Successful",
+        "message": "Your file has been uploaded successfully."
+      }
+    },
+    "payment": {
+      "success": {
+        "title": "Payment Successful",
+        "message": "Your payment has been processed successfully. Thank you for your purchase."
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "auth": {
+    "invalid_credentials": {
+      "title": "Login Failed",
+      "message": "Incorrect email or password. Please try again."
+    },
+    "account_locked": {
+      "title": "Account Locked",
+      "message": "Your account has been temporarily locked due to too many login attempts. Please try again in 15 minutes or contact support."
+    }
+  },
+  "validation": {
+    "required": {
+      "title": "Required Field",
+      "message": "{field} is required."
+    },
+    "email": {
+      "title": "Invalid Email Format",
+      "message": "Please enter a valid email address, e.g., name@domain.com."
+    }
+  },
+  "server": {
+    "internal_error": {
+      "title": "Something Went Wrong",
+      "message": "An error occurred on our server. Our team is working to fix it. Please try again later."
+    }
+  },
+  "resource": {
+    "not_found": {
+      "title": "Not Found",
+      "message": "The item you are looking for does not exist or has been deleted."
+    },
+    "alredy":{
+      "title":"Item alredy exist",
+      "message":"Your data with this {field} already exists"
+    },
+    "in_use":{
+      "title":"Item in use",
+      "message":"Cannot delete this {field} because it is being used"
+    }
+    
+  }
+}
