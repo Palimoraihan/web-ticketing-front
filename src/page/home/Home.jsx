@@ -32,48 +32,60 @@ import { useAuth } from "../../feature/auth/AuthContext";
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
 const { Search } = Input;
-const items = [
-  // {
-  //   key: "/dashboard",
-  //   label: "Dashboard",
-  //   icon: <LuLayoutDashboard />,
-  // },
-  {
-    key: "/ticket",
-    label: "Ticket",
-    icon: <LuTicket />,
-  },
-  {
-    key: "/settings",
-    label: "Settings",
-    icon: <LuSettings />,
-    children: [
-      {
-        key: "/settings/mandatory",
-        label: "Mandatory",
-        icon: <LuFileSliders />,
-      },
-      { key: "/settings/member", label: "Member", icon: <MdSupportAgent /> },
-      { key: "/settings/customer", label: "Customer", icon: <LuUserRound /> },
-    ],
-  },
-];
 const Home = ({ showNotif }) => {
   // const { user } = useAuth();
+  const { user, logout } = useAuth();
   useEffect(() => {
+    console.log(user);
+
     authCheck();
     getProfile();
   }, []);
   const navigate = useNavigate();
   let { id } = useParams();
-  const { logout } = useAuth();
   const location = useLocation();
-  const [user, setUser] = useState();
+  const [userrs, setUser] = useState();
   const [open, setOpen] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [dataCategory, setCategory] = useState([]);
   const [dataCutomer, setCustomer] = useState([]);
   const [dataAgent, setAgent] = useState([]);
+  // const items = [
+  //   // {
+  //   //   key: "/dashboard",
+  //   //   label: "Dashboard",
+  //   //   icon: <LuLayoutDashboard />,
+  //   // },
+  //   {
+  //     key: "/ticket",
+  //     label: "Ticket",
+  //     icon: <LuTicket />,
+  //   },
+  //   ...[
+  //     {
+  //       key: "/settings",
+  //       label: "Settings",
+  //       icon: <LuSettings />,
+  //       children: [
+  //         {
+  //           key: "/settings/mandatory",
+  //           label: "Mandatory",
+  //           icon: <LuFileSliders />,
+  //         },
+  //         {
+  //           key: "/settings/member",
+  //           label: "Member",
+  //           icon: <MdSupportAgent />,
+  //         },
+  //         {
+  //           key: "/settings/customer",
+  //           label: "Customer",
+  //           icon: <LuUserRound />,
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // ];
 
   const showDrawer = () => {
     setOpen(true);
@@ -87,9 +99,16 @@ const Home = ({ showNotif }) => {
   };
   const getProfile = () => {
     const storedUser = localStorage.getItem("user");
+    console.log(storedUser);
+
     const parsToJson = JSON.parse(storedUser);
-    const myName = parsToJson.first_name.concat(" ",parsToJson.last_name);
-    setUser(myName)
+    const myName = parsToJson.first_name.concat(" ", parsToJson.last_name);
+    const userData = {
+      name: myName,
+      role: parsToJson.role,
+    };
+
+    setUser(userData);
   };
   const fetchCategory = async () => {
     try {
@@ -214,7 +233,7 @@ const Home = ({ showNotif }) => {
             <Flex justify="flex-start" align="center">
               <Avatar shape="square" size="large" icon={<UserOutlined />} />
               <div style={{ paddingLeft: "8px" }}>
-                <h4>{user}</h4>
+                <h4>{userrs.name}</h4>
               </div>
             </Flex>
           </div>
@@ -233,7 +252,42 @@ const Home = ({ showNotif }) => {
                 style={{ border: "none", background: "#f9f9f9" }}
                 defaultSelectedKeys={[location.pathname]}
                 mode="vertical"
-                items={items}
+                items={[
+                  // {
+                  //   key: "/dashboard",
+                  //   label: "Dashboard",
+                  //   icon: <LuLayoutDashboard />,
+                  // },
+                  {
+                    key: "/ticket",
+                    label: "Ticket",
+                    icon: <LuTicket />,
+                  },
+                  ...(user.role!==3?[
+                    {
+                      key: "/settings",
+                      label: "Settings",
+                      icon: <LuSettings />,
+                      children: [
+                        {
+                          key: "/settings/mandatory",
+                          label: "Mandatory",
+                          icon: <LuFileSliders />,
+                        },
+                        {
+                          key: "/settings/member",
+                          label: "Member",
+                          icon: <MdSupportAgent />,
+                        },
+                        {
+                          key: "/settings/customer",
+                          label: "Customer",
+                          icon: <LuUserRound />,
+                        },
+                      ],
+                    },
+                  ]:[]),
+                ]}
               />
 
               <Button

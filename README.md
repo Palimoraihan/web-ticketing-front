@@ -1,660 +1,881 @@
-# Ticket Management System API
-
-Sistem manajemen tiket berbasis Express.js dengan fitur manajemen kategori, prioritas, status, SLA, pengguna, dan lampiran file.
+# CoreDesk - Ticket Management System
 
 ## 📋 Daftar Isi
 
-- [Gambaran Umum](#gambaran-umum)
-- [Struktur Proyek](#struktur-proyek)
-- [API Routes](#api-routes)
-- [Controllers](#controllers)
-- [Instalasi dan Konfigurasi](#instalasi-dan-konfigurasi)
-- [Contoh Penggunaan](#contoh-penggunaan)
+- [Tentang Project](#tentang-project)
+- [Fitur Utama](#fitur-utama)
+- [Tech Stack](#tech-stack)
+- [Struktur Folder](#struktur-folder)
+- [Instalasi](#instalasi)
+- [Konfigurasi API](#konfigurasi-api)
+- [Panduan Penggunaan](#panduan-penggunaan)
+- [Komponen](#komponen)
+- [Service Layer](#service-layer)
+- [Dokumentasi API](#dokumentasi-api)
 
 ---
 
-## Gambaran Umum
+## Tentang Project
 
-Sistem ini menyediakan REST API lengkap untuk mengelola tiket support dengan fitur-fitur:
-
-- **User Management**: Autentikasi, registrasi, dan manajemen pengguna dengan role berbeda
-- **Ticket Management**: Pembuatan, pembaruan, dan penugasan tiket
-- **Category & Priority**: Manajemen kategori tiket dan tingkat prioritas
-- **SLA Management**: Sistem Service Level Agreement dengan response dan resolution time
-- **Comments**: Sistem komentar untuk setiap tiket
-- **File Attachments**: Upload dan download file lampiran
-- **Audit Logging**: Pencatatan perubahan tiket dan SLA
+**CoreDesk** adalah sistem manajemen tiket berbasis web yang dirancang untuk membantu tim support mengelola dan melacak permintaan pelanggan secara efisien. Aplikasi ini memungkinkan pelanggan membuat tiket, tim support menugaskan tiket kepada agen, dan melacak SLA (Service Level Agreement).
 
 ---
 
-## Struktur Proyek
+## Fitur Utama
+
+### 1. **Manajemen Tiket**
+- Membuat tiket baru dengan kategori, prioritas, dan SLA
+- Menampilkan daftar tiket dengan filter (kategori, prioritas, status)
+- Mencari tiket berdasarkan judul/subject
+- Melihat detail tiket lengkap
+- Melacak waktu respons dan resolusi SLA
+
+### 2. **Sistem Pengguna**
+- Registrasi akun baru dengan validasi password kuat
+- Login dengan email dan password
+- Manajemen role (Customer, Member/Agent, Admin)
+- Autentikasi berbasis token
+- Profil pengguna
+
+### 3. **Pengaturan Mandatory**
+- **Priority**: Kelola tingkat prioritas tiket dengan warna custom
+- **Status**: Menentukan status tiket (Open, In Progress, Resolved, dll)
+- **Category**: Kategori tiket dengan SLA yang berbeda untuk setiap prioritas
+
+### 4. **Manajemen Tim**
+- **Member**: Kelola agen/staff support
+- **Customer**: Kelola daftar pelanggan
+- Penugasan tiket kepada agen
+
+### 5. **Tracking SLA**
+- Response time tracking
+- Resolution time tracking
+- Visual indicator untuk status SLA (hijau, oranye, merah)
+
+---
+
+## Tech Stack
+
+### Frontend
+- **React** - UI Library
+- **Ant Design (antd)** - Component UI
+- **React Router** - Navigation
+- **Axios** - HTTP Client
+- **Dayjs** - Date/Time Management
+- **React Icons** - Icon library
+
+### Backend (API)
+- Endpoint berbasis REST API
+- Authentication dengan Bearer Token
+- Axios interceptor untuk global config
+
+---
+
+## Struktur Folder
 
 ```
 project/
-├── routes/
-│   ├── attachment_routes.js
-│   ├── auth_check_routes.js
-│   ├── category_routes.js
-│   ├── comment_routes.js
-│   ├── priority_routes.js
-│   ├── role_routes.js
-│   ├── sla_routes.js
-│   ├── status_routes.js
-│   ├── ticket_routes.js
-│   └── user_routes.js
-├── controller/
-│   ├── attachment_controller.js
-│   ├── category_controller.js
-│   ├── comment_controller.js
-│   ├── priority_controller.js
-│   ├── role_controller.js
-│   ├── sla_controller.js
-│   ├── status_controller.js
-│   ├── ticket_controller.js
-│   └── user_controller.js
-├── middleware/
-│   ├── auth_midleware.js
-│   ├── query_params_middleware.js
-│   └── ticket_query_params_middleware.js
-├── validators/
-│   ├── comment_validator.js
-│   ├── mandatory_validator.js
-│   ├── sla_validation.js
-│   ├── ticket_validation.js
-│   └── user_validators.js
-├── models/
-│   └── index.js
-└── uploads/
-    └── (file uploads directory)
+├── src/
+│   ├── services/
+│   │   ├── categoryService.js       # Category & SLA management
+│   │   ├── commentServices.js       # Comment functionality
+│   │   ├── priorityServices.js      # Priority management
+│   │   ├── roleService.js           # Role management
+│   │   ├── statusServices.js        # Status management
+│   │   ├── ticketService.js         # Ticket operations
+│   │   ├── ticketClass.js           # Ticket class (legacy)
+│   │   └── userService.js           # User & authentication
+│   ├── pages/
+│   │   ├── Login.jsx                # Login page
+│   │   ├── Register.jsx             # Registration page
+│   │   ├── Home.jsx                 # Main layout & navigation
+│   │   ├── Dashboard.jsx            # Dashboard page
+│   │   ├── Ticket.jsx               # Ticket list & management
+│   │   ├── Settings.jsx             # Settings layout
+│   │   ├── Mandatory.jsx            # Mandatory settings
+│   │   ├── Customer.jsx             # Customer management
+│   │   └── Member.jsx               # Member/Agent management
+│   ├── component/
+│   │   ├── CategoryModal.jsx        # Category form modal
+│   │   ├── UserModal.jsx            # User form modal
+│   │   ├── StatusPriorityModal.jsx  # Status/Priority form modal
+│   │   ├── FilterComponent.jsx      # Filter component
+│   │   ├── DrawerTicket.jsx         # Ticket creation drawer
+│   │   └── BreatcrumNav.jsx         # Breadcrumb navigation
+│   ├── feature/
+│   │   └── auth/
+│   │       └── AuthContext.jsx      # Authentication context
+│   └── utils/
+│       └── axiosInstance.js         # Axios configuration
 ```
 
 ---
 
-## API Routes
-
-### 1. User Routes (`/api/users`)
-
-| Method | Endpoint | Auth | Deskripsi |
-|--------|----------|------|-----------|
-| GET | `/users` | ✓ | Dapatkan semua pengguna dengan pagination |
-| GET | `/users/:id` | ✗ | Dapatkan pengguna berdasarkan ID |
-| GET | `/customer` | ✗ | Dapatkan semua customer (role_id: 3) |
-| GET | `/agent` | ✗ | Dapatkan semua agent (role_id: 2) |
-| GET | `/member` | ✗ | Dapatkan semua member (bukan customer) |
-| POST | `/login` | ✗ | Login pengguna |
-| POST | `/register` | ✗ | Registrasi pengguna baru |
-| PUT | `/users/:id` | ✗ | Update data pengguna |
-| DELETE | `/users/:id` | ✗ | Hapus pengguna |
-
-**Query Parameters untuk GET /users:**
-- `limit`: Jumlah hasil per halaman (default: 10)
-- `offset`: Offset untuk pagination
-- `sort`: Field untuk sorting (default: id)
-- `order`: ASC atau DESC
-- `search`: Cari berdasarkan nama atau email
-
-**Contoh Request Login:**
-```json
-POST /login
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-**Response Login:**
-```json
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": 1,
-      "first_name": "John",
-      "last_name": "Doe",
-      "email": "john@example.com",
-      "role_id": 1,
-      "role": { "id": 1, "role_name": "Admin" }
-    },
-    "token": "eyJhbGciOiJIUzI1NiIs..."
-  }
-}
-```
-
----
-
-### 2. Ticket Routes (`/api/ticket`)
-
-| Method | Endpoint | Auth | Deskripsi |
-|--------|----------|------|-----------|
-| GET | `/ticket` | ✓ | Dapatkan semua tiket dengan filter |
-| GET | `/ticket/:id` | ✓ | Dapatkan detail tiket lengkap |
-| POST | `/ticket` | ✓ | Buat tiket baru |
-| PUT | `/ticket/:id` | ✓ | Update tiket |
-| PUT | `/assign/:id` | ✓ | Tetapkan tiket ke agent |
-
-**Query Parameters untuk GET /ticket:**
-- `search`: Cari berdasarkan subject
-- `category`: Filter berdasarkan kategori
-- `priority`: Filter berdasarkan prioritas
-- `status`: Filter berdasarkan status
-- `sort`: Field untuk sorting
-- `order`: ASC atau DESC
-
-**Contoh Request Buat Tiket:**
-```json
-POST /ticket
-{
-  "subject": "Database connection error",
-  "user_id": 3,
-  "agent_id": 2,
-  "category_id": 1,
-  "priority_id": 2,
-  "status_id": 1,
-  "comment": "System cannot connect to database"
-}
-```
-
-**Response Detail Tiket:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": 1,
-    "subject": "Database connection error",
-    "user": { "id": 3, "first_name": "Jane", "last_name": "Smith" },
-    "agent": { "id": 2, "first_name": "John", "last_name": "Support" },
-    "category": { "id": 1, "name": "Technical" },
-    "priority": { "id": 2, "name": "High", "color": "#FF5733" },
-    "status": { "id": 1, "name": "Open", "color": "#3498DB" },
-    "sla": { "id": 1, "sla_name": "Priority High", "response_time": 3600, "resolution_time": 86400 },
-    "comments": [ { "id": 1, "message": "Investigating...", "user": {...} } ],
-    "attachments": [ { "id": 1, "file_url": "file-123.pdf" } ],
-    "logs": [ { "action": "Created", "changed_by": 1 } ]
-  }
-}
-```
-
----
-
-### 3. Category Routes (`/api/category`)
-
-| Method | Endpoint | Auth | Deskripsi |
-|--------|----------|------|-----------|
-| GET | `/category` | ✗ | Dapatkan semua kategori |
-| GET | `/category/:id` | ✗ | Dapatkan detail kategori |
-| GET | `/category-by-sla` | ✗ | Dapatkan kategori dengan SLA |
-| POST | `/category` | ✗ | Buat kategori baru |
-| POST | `/category-sla` | ✗ | Buat kategori dengan SLA |
-| PUT | `/category/:id` | ✗ | Update kategori |
-| PUT | `/category-sla/:id` | ✗ | Update kategori dengan SLA |
-| DELETE | `/category/:id` | ✗ | Hapus kategori |
-
-**Contoh Request Buat Kategori dengan SLA:**
-```json
-POST /category-sla
-{
-  "name": "Technical Support",
-  "slas": [
-    {
-      "priority_id": 1,
-      "response_time": 3600,
-      "resolution_time": 86400
-    },
-    {
-      "priority_id": 2,
-      "response_time": 1800,
-      "resolution_time": 43200
-    }
-  ]
-}
-```
-
----
-
-### 4. Priority Routes (`/api/priority`)
-
-| Method | Endpoint | Auth | Deskripsi |
-|--------|----------|------|-----------|
-| GET | `/priority` | ✗ | Dapatkan semua prioritas |
-| GET | `/priority/:id` | ✗ | Dapatkan prioritas berdasarkan ID |
-| POST | `/priority` | ✗ | Buat prioritas baru |
-| PUT | `/priority/:id` | ✗ | Update prioritas |
-| DELETE | `/priority/:id` | ✗ | Hapus prioritas |
-
-**Contoh Request Buat Prioritas:**
-```json
-POST /priority
-{
-  "name": "Critical",
-  "color": "#E74C3C"
-}
-```
-
----
-
-### 5. Status Routes (`/api/status`)
-
-| Method | Endpoint | Auth | Deskripsi |
-|--------|----------|------|-----------|
-| GET | `/status` | ✗ | Dapatkan semua status |
-| GET | `/status/:id` | ✗ | Dapatkan status berdasarkan ID |
-| POST | `/status` | ✗ | Buat status baru |
-| PUT | `/status/:id` | ✗ | Update status |
-| DELETE | `/status/:id` | ✗ | Hapus status |
-
----
-
-### 6. SLA Routes (`/api/sla`)
-
-| Method | Endpoint | Auth | Deskripsi |
-|--------|----------|------|-----------|
-| GET | `/sla` | ✗ | Dapatkan semua SLA |
-| GET | `/sla/:id` | ✗ | Dapatkan SLA berdasarkan ID |
-| POST | `/sla` | ✗ | Buat SLA baru |
-| PUT | `/sla/:id` | ✗ | Update SLA |
-
-**Contoh Request Buat SLA:**
-```json
-POST /sla
-{
-  "sla_name": "Premium Support",
-  "description": "24/7 support with 1 hour response time",
-  "response_time": 3600,
-  "resolution_time": 86400,
-  "category_id": 1,
-  "priority_id": 1
-}
-```
-
----
-
-### 7. Comment Routes (`/api/comment`)
-
-| Method | Endpoint | Auth | Deskripsi |
-|--------|----------|------|-----------|
-| GET | `/comment` | ✓ | Dapatkan semua komentar |
-| POST | `/comment` | ✓ | Buat komentar baru |
-
-**Contoh Request Buat Komentar:**
-```json
-POST /comment
-{
-  "message": "Issue has been resolved",
-  "ticket_id": 1
-}
-```
-
----
-
-### 8. Attachment Routes (`/api/attachment`)
-
-| Method | Endpoint | Auth | Deskripsi |
-|--------|----------|------|-----------|
-| POST | `/file-upload` | ✗ | Upload file attachment |
-| GET | `/file/:ticket_id` | ✗ | Dapatkan attachment tiket |
-| GET | `/download/:filename` | ✗ | Download file |
-
-**File Upload Configuration:**
-- **Max Size**: 10MB
-- **Allowed Types**: jpeg, jpg, png, gif, pdf, doc, docx, txt
-- **Storage**: Folder `uploads/`
-
-**Contoh Request Upload:**
-```
-POST /file-upload
-Content-Type: multipart/form-data
-
-file: <binary file>
-ticket_id: 1
-last_comment: "Document attached"
-```
-
----
-
-### 9. Auth Routes (`/api/auth-check`)
-
-| Method | Endpoint | Auth | Deskripsi |
-|--------|----------|------|-----------|
-| GET | `/auth-check` | ✓ | Validasi token autentikasi |
-
----
-
-### 10. Role Routes (`/api/role`)
-
-| Method | Endpoint | Auth | Deskripsi |
-|--------|----------|------|-----------|
-| GET | `/role` | ✗ | Dapatkan semua role |
-
-**Role Default:**
-- `1`: Admin
-- `2`: Agent
-- `3`: Customer
-
----
-
-## Controllers
-
-### User Controller
-
-**Fungsi Utama:**
-- `getAllUser()`: Mendapatkan semua pengguna dengan filter dan pagination
-- `getUserById()`: Mendapatkan pengguna spesifik
-- `getAllCustomer()`: Mendapatkan semua customer
-- `getAllAgent()`: Mendapatkan semua agent
-- `getAllMember()`: Mendapatkan semua member
-- `loginUser()`: Autentikasi pengguna dan generate JWT token
-- `createUser()`: Registrasi pengguna baru
-- `updateUser()`: Memperbarui data pengguna
-- `deleteUser()`: Menghapus pengguna
-
-**Security Features:**
-- Password hashing (tidak pernah dikembalikan dalam response)
-- JWT token generation (2 hari ekspirasi)
-- Validasi email unik
-- Role-based access control
-
----
-
-### Ticket Controller
-
-**Fungsi Utama:**
-- `getAllTicket()`: Mendapatkan tiket dengan filter berdasarkan role
-- `getTicketById()`: Mendapatkan detail tiket lengkap
-- `createTicket()`: Membuat tiket baru dengan SLA otomatis
-- `updateTicket()`: Memperbarui tiket dan mencatat perubahan
-- `assignTicket()`: Menugaskan tiket ke agent
-
-**Role-Based Filtering:**
-- Admin: Melihat semua tiket
-- Agent: Melihat tiket yang ditugaskan atau belum ditugaskan
-- Customer: Hanya melihat tiket miliknya
-
-**Automatic SLA Calculation:**
-- Response time dan resolution time dihitung berdasarkan kategori dan prioritas
-- Sistem mencatat waktu response dan resolution
-
----
-
-### Category Controller
-
-**Fungsi Utama:**
-- `getAllCategory()`: Mendapatkan semua kategori
-- `getCategoryById()`: Mendapatkan kategori dengan SLA
-- `createCategory()`: Membuat kategori baru
-- `createCategoryWithSla2()`: Membuat kategori dengan SLA menggunakan transaction
-- `updateCategory()`: Memperbarui kategori
-- `updateCategoryWithSla()`: Memperbarui kategori dan SLA dengan validasi
-- `deleteCategory()`: Menghapus kategori
-
-**Validasi:**
-- Nama kategori unik
-- SLA tidak bisa dihapus jika sedang digunakan di tiket
-- Response time < resolution time
-
----
-
-### Attachment Controller
-
-**Fungsi Utama:**
-- `uploadAttachment()`: Upload file dengan validasi tipe
-- `getAttachments()`: Mendapatkan file dari tiket tertentu
-- `downloadFile()`: Download file dengan content-type yang tepat
-
-**File Handling:**
-- Automatic directory creation
-- Unique filename generation dengan timestamp
-- Content-type detection berdasarkan ekstensi
-
----
-
-### Priority Controller
-
-**Fungsi Utama:**
-- `getAllPriority()`: Mendapatkan semua prioritas
-- `getPriorityById()`: Mendapatkan prioritas spesifik
-- `createPriority()`: Membuat prioritas dengan color code
-- `updatePriority()`: Memperbarui prioritas
-- `deletePriority()`: Menghapus prioritas (jika tidak digunakan)
-
----
-
-### Status Controller
-
-**Fungsi Utama:**
-- `getAllStatus()`: Mendapatkan semua status
-- `getStatusById()`: Mendapatkan status spesifik
-- `createStatus()`: Membuat status baru
-- `updateStatus()`: Memperbarui status
-- `deleteStatus()`: Menghapus status (jika tidak digunakan)
-
----
-
-### SLA Controller
-
-**Fungsi Utama:**
-- `getAllSla()`: Mendapatkan semua SLA dengan relasi
-- `getSlaById()`: Mendapatkan SLA spesifik
-- `createSla()`: Membuat SLA baru
-- `updateSla()`: Memperbarui SLA
-
----
-
-### Comment Controller
-
-**Fungsi Utama:**
-- `getAllComments()`: Mendapatkan semua komentar dengan user info
-- `createComment()`: Membuat komentar baru pada tiket
-
----
-
-### Role Controller
-
-**Fungsi Utama:**
-- `getAllRole()`: Mendapatkan semua role yang tersedia
-
----
-
-## Instalasi dan Konfigurasi
+## Instalasi
 
 ### Prerequisites
-
 - Node.js (v14 atau lebih tinggi)
-- Express.js
-- Sequelize ORM
-- MySQL atau database relasional lainnya
+- npm atau yarn
 
-### Installation
+### Steps
 
+1. **Clone Repository**
 ```bash
-# Clone repository
 git clone <repository-url>
+cd coredesk
+```
 
-# Install dependencies
+2. **Install Dependencies**
+```bash
 npm install
-
-# Setup environment variables
-cp .env.example .env
 ```
 
-### Environment Variables
-
+3. **Konfigurasi Environment**
+Buat file `.env` di root directory:
 ```env
-# Database
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=ticketing_system
-DB_USER=root
-DB_PASSWORD=password
-
-# JWT
-JWT_SECRET=your_secret_key_here
-
-# Server
-PORT=3000
-NODE_ENV=development
-
-# File Upload
-UPLOAD_DIR=uploads
-MAX_FILE_SIZE=10485760
+REACT_APP_API_BASE_URL=http://localhost:3000/api
 ```
 
-### Database Setup
-
+4. **Jalankan Development Server**
 ```bash
-# Run migrations
-npm run migrate
-
-# Seed initial data (roles, statuses, priorities)
-npm run seed
-```
-
-### Starting the Server
-
-```bash
-# Development mode
-npm run dev
-
-# Production mode
 npm start
 ```
 
+Aplikasi akan terbuka di `http://localhost:3000`
+
 ---
 
-## Contoh Penggunaan
+## Konfigurasi API
 
-### 1. User Registration dan Login
+### Axios Instance (`utils/axiosInstance.js`)
 
-```bash
-# Register
-curl -X POST http://localhost:3000/api/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "first_name": "John",
-    "last_name": "Doe",
-    "email": "john@example.com",
-    "password": "secure_password"
-  }'
+Konfigurasi dasar:
+- Base URL: Diatur melalui environment variable `REACT_APP_API_BASE_URL`
+- Request timeout: 30 detik
+- Content-Type: application/json
 
-# Login
-curl -X POST http://localhost:3000/api/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "john@example.com",
-    "password": "secure_password"
-  }'
+### Authentication
+
+Token disimpan di `localStorage` dengan struktur:
+```json
+{
+  "id": "user_id",
+  "first_name": "John",
+  "last_name": "Doe",
+  "role": "role_id",
+  "token": "Bearer_token_here"
+}
 ```
 
-### 2. Create Ticket dengan Attachment
-
-```bash
-# Step 1: Create ticket
-curl -X POST http://localhost:3000/api/ticket \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "subject": "Application crash on startup",
-    "user_id": 3,
-    "category_id": 1,
-    "priority_id": 1,
-    "status_id": 1,
-    "comment": "App crashes when launched"
-  }'
-
-# Step 2: Upload attachment
-curl -X POST http://localhost:3000/api/file-upload \
-  -F "file=@error_log.pdf" \
-  -F "ticket_id=1" \
-  -F "last_comment=Error log attached"
+Setiap request memerlukan header:
 ```
-
-### 3. Update Ticket Status dan Assign Agent
-
-```bash
-# Assign ticket to agent
-curl -X PUT http://localhost:3000/api/assign/1 \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent_id": 2
-  }'
-
-# Update ticket status
-curl -X PUT http://localhost:3000/api/ticket/1 \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "status_id": 3
-  }'
-```
-
-### 4. Create Category dengan Multiple SLA
-
-```bash
-curl -X POST http://localhost:3000/api/category-sla \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Billing Support",
-    "slas": [
-      {
-        "priority_id": 1,
-        "response_time": 1800,
-        "resolution_time": 14400
-      },
-      {
-        "priority_id": 2,
-        "response_time": 3600,
-        "resolution_time": 28800
-      },
-      {
-        "priority_id": 3,
-        "response_time": 7200,
-        "resolution_time": 86400
-      }
-    ]
-  }'
+Authorization: Bearer {token}
 ```
 
 ---
 
-## Notes Penting
+## Panduan Penggunaan
 
-### Security
+### 1. Login dan Register
 
-- ⚠️ Pastikan `authenticateToken` middleware diaktifkan untuk routes yang membutuhkan autentikasi (saat ini commented)
-- ⚠️ Jangan pernah commit `.env` file
-- ⚠️ Gunakan HTTPS di production
-- ⚠️ Implement rate limiting untuk prevent abuse
+**Registrasi:**
+- Buka halaman Register
+- Isi form dengan data yang valid
+- Password harus memenuhi kriteria:
+  - Minimal 8 karakter
+  - Minimal 1 huruf besar
+  - Minimal 1 huruf kecil
+  - Minimal 1 angka
+  - Minimal 1 simbol
 
-### Performance
+**Login:**
+- Masukkan email dan password
+- Sistem akan memvalidasi dan menyimpan token
 
-- Implementasi pagination untuk query besar
-- Gunakan database indexing pada field yang sering dicari
-- Cache data yang jarang berubah
+### 2. Membuat Tiket
 
-### Validasi & Error Handling
+1. Klik tombol "New Ticket" di halaman Ticket
+2. Isi form dengan:
+   - Category
+   - Priority
+   - Subject
+   - Description
+3. Klik Submit
 
-- Semua input harus divalidasi
-- Response error konsisten menggunakan format standar
-- Implement proper logging untuk debugging
+### 3. Mengelola Tiket
+
+**Filter & Search:**
+- Gunakan search box untuk mencari berdasarkan judul
+- Filter berdasarkan Category, Priority, dan Status
+- Sistem mendukung pagination
+
+**Assign Tiket:**
+- Klik Select Agent pada kolom Assignee
+- Pilih agent dari dropdown
+- Konfirmasi assignment
+
+**Detail Tiket:**
+- Klik pada subject tiket untuk melihat detail
+- Lihat tracking SLA dan komentar
+
+### 4. Manajemen Setting
+
+**Priority:**
+- Go to Settings → Mandatory → Priority
+- Tambah/edit/hapus priority dengan custom warna
+
+**Status:**
+- Go to Settings → Mandatory → Status
+- Kelola status tiket yang tersedia
+
+**Category:**
+- Go to Settings → Mandatory → Category
+- Set SLA (response time & resolution time) untuk setiap kategori dan prioritas
+
+**Member:**
+- Go to Settings → Member
+- Tambah agent/staff baru
+- Edit atau hapus member
+
+**Customer:**
+- Go to Settings → Customer
+- Tambah atau kelola daftar customer
+
+---
+
+## Komponen
+
+### Pages
+
+#### Login.jsx
+Halaman login dengan validasi form dan error handling.
+
+**Props:** Tidak ada
+
+**State:**
+- `isLoad`: Loading state
+- `visible`: Alert visibility
+- `messageError`: Error message
+
+**Key Functions:**
+- `onFinish(values)`: Handle login submission
+
+---
+
+#### Register.jsx
+Halaman registrasi dengan validasi password kompleks.
+
+**Props:** Tidak ada
+
+**State:**
+- `isLoad`: Loading state
+- `visible`: Alert visibility
+- `messageError`: Error message
+
+**Password Requirements:**
+- Minimal 8 karakter
+- Minimal 1 huruf kecil
+- Minimal 1 huruf besar
+- Minimal 1 angka
+- Minimal 1 simbol
+
+**Key Functions:**
+- `onFinish(values)`: Handle registration
+- `delay(ms)`: Promise-based delay function
+
+---
+
+#### Ticket.jsx
+Manajemen dan tampilan daftar tiket dengan filter dan search.
+
+**Props:** Tidak ada
+
+**State:**
+- `dataTicket`: Array of tickets
+- `tableParams`: Pagination dan filter params
+- `search`: Search query
+- `debouncedQuery`: Debounced search query
+- `dataAgent`: Available agents
+- `dataCategory/Priority/Status`: Filter options
+
+**Key Functions:**
+- `fetchTicket()`: Ambil data tiket dengan params
+- `uploadAssign(ticketId, agentId)`: Assign tiket ke agent
+- `handleTableChange(pagination, filters, sorter)`: Handle table changes
+- `showConfirm(ticketId, agentId)`: Konfirmasi assignment modal
+
+**Features:**
+- Search dengan debounce (500ms)
+- Filter by category, priority, status
+- Pagination
+- Assign agent to ticket
+- SLA color indicator (red/orange/green)
+- Role-based column visibility
+
+---
+
+#### DetailTicket.jsx
+Halaman detail tiket dengan fitur update, assign, dan comment.
+
+**Props:** Tidak ada
+
+**State:**
+- `dataTicketDetail`: Detail ticket object
+- `isModal`: Update ticket modal state
+- `isModalAssign`: Assign modal state
+- `responsePercentage`: Response SLA percentage
+- `resolutionPercentage`: Resolution SLA percentage
+
+**Key Functions:**
+- `fetchDetailTicket()`: Fetch detail ticket
+- `updateDetailTicket(payload)`: Update category/priority/status
+- `assignAgentTicket(agentId)`: Assign agent to ticket
+- `calcPercentageTime(time, duedate, timeDur)`: Calculate SLA percentage
+- `refreshTicket()`: Refresh data after comment
+
+**Layout:**
+- **Content Area**: Comment section dengan scroll
+- **Sidebar (25%)**: 
+  - Requester info
+  - Assignee info
+  - Ticket details (category, priority, status)
+  - Response time tracking
+  - Resolution time tracking
+
+**Conditional Rendering:**
+- Assign button: Hidden jika sudah ada agent atau user role = 3
+- Change button: Hidden jika status = 17 (closed) atau user role = 3
+- SLA cards: Hidden untuk customer (role = 3)
+
+---
+
+#### Customer.jsx & Member.jsx
+Manajemen customer dan member dengan fitur add/edit/delete dan search.
+
+**Props:** Tidak ada
+
+**State:**
+- `dataUser`: Array of users
+- `dataRole`: Array of roles
+- `query`: Search query
+- `debouncedQuery`: Debounced search query (500ms)
+- `isWarning`: Warning message state
+
+**Key Functions:**
+- `getUsers(search)`: Fetch users dengan optional search parameter
+- `uploadAgent(value)`: Create atau update user
+- `deleteUser(id)`: Delete user (with error handling)
+- `modalTriger(isModal, data)`: Open/close modal
+
+**Features:**
+- Real-time search dengan debounce
+- Add/Edit/Delete operations
+- Role selection (untuk Member page)
+- Default password: "Password123"
+- Warning alerts untuk delete errors
+
+---
+
+#### Category.jsx / Priority.jsx / StatusPage.jsx
+Manajemen kategori, prioritas, dan status dengan CRUD operations.
+
+**State:**
+- `dataPriority/Status`: List data
+- `isModalOpen`: Modal visibility
+- `isEdit`: Edit mode flag
+- `isError/isBodyError`: Error states
+- `dataModal`: Selected item for edit
+
+**Key Functions:**
+- `getDataCategoryApi()`: Fetch categories
+- `showModal(isEdited, dataMap)`: Open modal (create/edit mode)
+- `handleOk(value)`: Submit form (create/update)
+- `deleteData(id)`: Delete item with error handling
+- `mergeAll(dataCategory)`: Merge category with SLA data (Category only)
+
+**Error Handling:**
+- 400: Validation error
+- 409: Conflict (duplicate or in use)
+- 404: Not found
+- 500: Internal server error
+
+---
+
+#### Home.jsx
+Main layout dengan sidebar navigation, header, dan auth checking.
+
+**Props:**
+- `showNotif`: Function to show session expired notification
+
+**State:**
+- `user`: User name from localStorage
+- `open`: Drawer state
+- `isLoading`: Loading state
+- `dataCategory/Customer/Agent`: Data untuk drawer ticket
+
+**Key Functions:**
+- `authCheck()`: Verify token validity
+- `getProfile()`: Get user profile dari localStorage
+- `showDrawer()`: Open drawer & fetch data
+- `onClose()`: Close drawer & reset state
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│          Sider (Sidebar)            │
+│  - User Avatar & Name               │
+│  - Navigation Menu                  │
+│  - Logout Button                    │
+├─────────────────────────────────────┤
+│          Header (Sticky)            │
+│  - Page Title                       │
+│  - New Ticket Button                │
+├─────────────────────────────────────┤
+│          Content                    │
+│  - <Outlet /> (nested routes)       │
+└─────────────────────────────────────┘
+```
+
+**Navigation Items:**
+- Ticket
+- Settings
+  - Mandatory (Status, Priority, Category)
+  - Member
+  - Customer
+
+---
+
+#### SettingsPage.jsx
+Layout untuk settings dengan nested routes.
+
+**Features:**
+- Dynamic page title based on route
+- Outlet untuk nested routes
+- Conditional rendering judul
+
+---
+
+#### MandatoryPage.jsx
+Settings page dengan segmented control untuk Status, Priority, dan Category.
+
+**State:**
+- `selected`: Current selected tab (1=Status, 2=Priority, 3=Category)
+
+**Key Functions:**
+- `onChange(val)`: Handle tab change
+- `ContentItem()`: Render content based on selected tab
+
+---
+
+### Components (Reusable)
+
+#### DrawerTicket.jsx
+Drawer component untuk membuat tiket baru.
+
+**Props:**
+- `isOpen`: Drawer visibility
+- `isLoading`: Loading state
+- `onClose`: Close handler
+- `dataCategory`: Array of categories
+- `dataCustomer`: Array of customers (for requester)
+- `dataAgent`: Array of agents (for assignment)
+
+**Key Functions:**
+- `onFinish(value)`: Submit ticket creation
+- `handleChangeCategory(value)`: Load priorities by category
+- `closeDrawer()`: Close & reset form
+
+**Form Fields:**
+- Subject (required)
+- Category (required) - triggers priority loading
+- Priority (required) - disabled until category selected
+- Requester (required - hidden for customer role)
+- Assignee (optional - hidden for customer role)
+- Comment (optional)
+
+---
+
+#### CategoryModal.jsx
+Modal untuk create/update category dengan SLA configuration.
+
+**Props:**
+- `titleModal`: Modal title
+- `isModalOpen`: Visibility state
+- `onCancel`: Cancel handler
+- `onDone`: Success callback
+- `warningFunc`: Warning message handler
+- `categoryData`: Data for edit mode (null for create)
+
+**Custom Component:**
+- `TimeInput`: Custom input untuk Days, Hours, Minutes, Seconds
+
+**Key Functions:**
+- `getData()`: Fetch priorities
+- `initForm()`: Initialize form for edit mode
+- `convertSecondToObj(seconds)`: Convert seconds to D:H:M:S object
+- `uploadPriority(payload)`: Submit to API
+- `handleCheckboxChange(checkedValues)`: Update selected priorities
+
+**Form Flow:**
+1. Input category name
+2. Select priorities (checkbox)
+3. For each selected priority:
+   - Set Response Time (D:H:M:S)
+   - Set Resolution Time (D:H:M:S)
+
+**Data Transformation:**
+```javascript
+// Input: {day: 1, hour: 2, minute: 30, second: 0}
+// Output: 95400 seconds
+```
+
+---
+
+#### TicketDetailModal.jsx
+Modal untuk mengubah category, priority, atau status tiket.
+
+**Props:**
+- `statusId`: Current status ID
+- `categoryId`: Current category ID
+- `priorityId`: Current priority ID
+- `isModal`: Visibility state
+- `onCancel`: Cancel handler
+- `onFinish`: Submit handler
+
+**Key Features:**
+- Status progression (hanya bisa ke status yang lebih tinggi)
+- Category change (hanya di status = 1/Open)
+- Auto-load priority saat category berubah
+- Dynamic form fields based on status
+
+**Conditional Fields:**
+- Status = 1 (Open): Show Category + Priority + Status
+- Status > 1: Show Status only
+
+---
+
+#### AssigneeModal.jsx
+Modal untuk assign agent ke tiket.
+
+**Props:**
+- `isModal`: Visibility state
+- `onCancel`: Cancel handler
+- `onFinish`: Submit handler
+
+**Key Functions:**
+- `fetchAgent()`: Load available agents
+
+---
+
+#### StatusPriorityModal.jsx
+Reusable modal untuk Status dan Priority create/update.
+
+**Props:**
+- `isEdit`: Edit mode flag
+- `modalTitle`: Modal title
+- `formLabel`: Label untuk form ("status"/"priority")
+- `isModalOpen`: Visibility state
+- `isModalLoading`: Loading state
+- `onCancel`: Cancel handler
+- `form`: Ant Design form instance
+- `formName`: Form name
+- `onFinish`: Submit handler
+- `isError`: Error message
+- `formVal`: Form values for edit
+
+**Form Fields:**
+- Name (required)
+- Color (ColorPicker with hex format)
+
+---
+
+#### UserModal.jsx
+Modal untuk create/update Member dan Customer.
+
+**Props:**
+- `modalTitle`: Modal title
+- `formLabel`: Label untuk form
+- `isModalOpen`: Visibility state
+- `isModalLoading`: Loading state
+- `isMember`: Boolean - show role field if true
+- `onCancel`: Cancel handler
+- `formName`: Form name
+- `onFinish`: Submit handler
+- `isError`: Error message
+- `roleData`: Array of roles (for member)
+- `formVal`: Form values for edit
+
+**Form Fields:**
+- Email (required, disabled in edit mode)
+- Role (required, only for members)
+
+---
+
+#### ContentDetailTicket.jsx
+Content area untuk halaman detail ticket dengan comment section.
+
+**Props:**
+- `subject`: Ticket subject
+- `comments`: Array of comments
+- `ticketId`: ID tiket
+- `refreshTicket`: Callback to refresh data
+
+**Layout:**
+```
+┌─────────────────────────────────────┐
+│  Header: Subject + Back Button      │
+├─────────────────────────────────────┤
+│  Content: Chat Bubbles (scrollable) │
+│  - Auto scroll to bottom            │
+│  - Loading spinner saat posting     │
+├─────────────────────────────────────┤
+│  Footer: TextArea + Send Button     │
+└─────────────────────────────────────┘
+```
+
+**Key Functions:**
+- `postComment()`: Post new comment
+- `onFinish(value)`: Handle textarea change
+
+**Features:**
+- Auto-scroll ke bottom setelah comment
+- Disable send button saat loading
+- Textarea auto-resize (1-100 rows)
+
+---
+
+#### ChatBuble.jsx
+Component untuk menampilkan single comment.
+
+**Props:**
+- `name`: User name
+- `message`: Comment message
+- `createdAt`: Timestamp
+
+**Display:**
+- Avatar icon
+- User name & timestamp
+- Message text
+
+---
+
+#### FilterComponent.jsx
+Reusable filter component untuk Ticket page.
+
+**Props:**
+- `title`: Filter title
+- `child`: Array of options
+- `isValue`: Currently selected value
+- `onSend`: Change handler
+
+**Layout:**
+- Title dengan secondary text
+- Checkboxes dalam 3 kolom (Col span={8})
+- Single selection (checkbox)
+
+---
+
+#### BreadcrumbNav.jsx
+Breadcrumb navigation component (currently unused in active pages).
+
+**Features:**
+- Auto-generate breadcrumb dari URL path
+- Capitalize first letter
+- Replace hyphens dengan spaces
+
+---
+
+## Service Layer
+
+### userService.js
+
+```javascript
+login(credential)                  // Login user
+register(payload)                  // Register new user
+getCustomer(search)               // Get customers list
+getAgent()                        // Get agents list
+getMember(search)                 // Get members/agents
+updateUser(id, payload)           // Update user info
+deleteUser(id)                    // Delete user
+getAuthCheck(token)               // Verify token validity
+```
+
+### ticketService.js
+
+```javascript
+createTicket(payload, token)          // Create new ticket
+getTickets(params, token)             // Get tickets with pagination
+getDetailTicket(id, token)            // Get ticket detail
+updateDetailTicket(id, payload, token) // Update ticket
+assignTicket(payload, token)          // Assign ticket to agent
+```
+
+### categoryService.js
+
+```javascript
+createCategory(payload)           // Create category with SLA
+updateCategory(id, payload)       // Update category
+getCategory()                     // Get all categories
+getCategoryById(id)               // Get category detail
+```
+
+### priorityService.js
+
+```javascript
+getPriority()                     // Get all priorities
+createPriority(payload)           // Create priority
+updatePriority(payload, id)       // Update priority
+deletePriority(id)                // Delete priority
+```
+
+### statusServices.js
+
+```javascript
+getStatus()                       // Get all statuses
+createStatus(payload)             // Create status
+updateStatus(payload, id)         // Update status
+deleteStatus(id)                  // Delete status
+```
+
+### commentServices.js
+
+```javascript
+createComment(payload, token)     // Create comment on ticket
+```
+
+### roleService.js
+
+```javascript
+getRole()                         // Get all available roles
+```
+
+---
+
+## Dokumentasi API
+
+### Base URL
+```
+http://localhost:3000/api
+```
+
+### Authentication
+Gunakan Bearer Token di header:
+```
+Authorization: Bearer {token}
+```
+
+### Endpoints Utama
+
+#### Authentication
+- `POST /login` - Login user
+- `POST /register` - Register new user
+- `GET /auth-check` - Verify token
+
+#### Tickets
+- `POST /ticket` - Create ticket
+- `GET /ticket?limit=10&page=1` - Get tickets with pagination
+- `GET /ticket/{id}` - Get ticket detail
+- `PUT /ticket/{id}` - Update ticket
+- `PUT /assign/{id}` - Assign ticket to agent
+
+#### Categories
+- `POST /category-sla` - Create category with SLA
+- `PUT /category-sla/{id}` - Update category
+- `GET /category-by-sla` - Get all categories
+- `GET /category/{id}` - Get category detail
+
+#### Priority
+- `GET /priority` - Get all priorities
+- `POST /priority` - Create priority
+- `PUT /priority/{id}` - Update priority
+- `DELETE /priority/{id}` - Delete priority
+
+#### Status
+- `GET /status` - Get all statuses
+- `POST /status` - Create status
+- `PUT /status/{id}` - Update status
+- `DELETE /status/{id}` - Delete status
+
+#### Users
+- `GET /customer?search={query}` - Get customers
+- `GET /agent` - Get agents
+- `GET /member?search={query}` - Get members
+- `PUT /users/{id}` - Update user
+- `DELETE /users/{id}` - Delete user
+
+#### Comments
+- `POST /comment` - Create comment
+
+---
+
+## Error Handling
+
+Sistem menggunakan error response standardisasi:
+
+```json
+{
+  "error": "Error message here",
+  "status": 400
+}
+```
+
+Common HTTP Status Codes:
+- `400` - Bad Request / Validation Error
+- `401` - Unauthorized
+- `404` - Not Found
+- `409` - Conflict (Resource already exists)
+- `500` - Internal Server Error
+
+---
+
+## Tips Pengembangan
+
+1. **Debouncing Search**: Gunakan `setTimeout` untuk menghindari API calls terlalu sering
+2. **Token Management**: Selalu simpan token di localStorage dan pass sebagai header
+3. **Error Messages**: Gunakan JSON file `messageError.json` dan `messageSuccess.json` untuk consistency
+4. **Form Validation**: Ant Design Form component sudah support validasi built-in
+5. **Loading States**: Gunakan Spin component dari Ant Design untuk feedback visual
 
 ---
 
 ## Troubleshooting
 
-**Error: "Ticket not found"**
-- Pastikan `ticket_id` valid dan tiket ada di database
+### Token Expired
+- User akan di-redirect ke login page
+- Notification akan ditampilkan
 
-**Error: "SLA not found"**
-- Pastikan kategori dan prioritas memiliki SLA yang sesuai
+### Failed to Load Data
+- Check browser console untuk error detail
+- Verify API base URL di `.env`
+- Pastikan token masih valid
 
-**Error: "File type not allowed"**
-- Hanya file dengan tipe: jpeg, jpg, png, gif, pdf, doc, docx, txt yang diizinkan
-
-**Error: "Cannot delete category"**
-- Kategori sedang digunakan oleh tiket. Hapus semua tiket dengan kategori ini terlebih dahulu
+### Search/Filter Tidak Work
+- Pastikan debounce delay tidak terlalu panjang
+- Check network tab untuk API request
 
 ---
 
-## Lisensi
+## Kontribusi
 
-MIT License - Bebas untuk digunakan dalam proyek komersial maupun non-komersial.
+Untuk berkontribusi pada project ini:
+
+1. Create branch baru (`git checkout -b feature/nama-fitur`)
+2. Commit changes (`git commit -m 'Add feature'`)
+3. Push ke branch (`git push origin feature/nama-fitur`)
+4. Buat Pull Request
+
+---
+
+## License
+
+Project ini adalah proprietary software. Semua rights reserved.
+
+---
+
+## Contact
+
+Untuk pertanyaan atau support, silakan hubungi tim development.
+
+---
+
+**Last Updated**: Oktober 2025

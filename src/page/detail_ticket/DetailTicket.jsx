@@ -230,7 +230,7 @@ const DetailTicket = () => {
                 <Flex vertical gap="middle">
                   <Flex justify="space-between">
                     <h3 style={{ margin: "0px" }}>Ticket Detail</h3>
-                    {dataTicketDetail.status.id !== 17 || user.role !== 3 ? (
+                    {dataTicketDetail.status.id !== 17 && user.role !== 3 ? (
                       <Button color="primary" variant="link" onClick={onModal}>
                         {" "}
                         Change
