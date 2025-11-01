@@ -4,7 +4,7 @@ import { GrStatusGood } from "react-icons/gr";
 import { useState } from "react";
 import CategoryPage from "./category/Category";
 import PriorityPage from "./priority/Priority";
-import StatusPage from "./Status/StatusPage";
+import StatusPage from "./status/StatusPage";
 
 const { Header, Content } = Layout;
 const items = [
