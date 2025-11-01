@@ -14,7 +14,7 @@ import {
 } from "antd";
 import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
 import { LoadingOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import loginImage from "../../assets/login-img.jpg";
 import logo from "../../assets/CoreDesk-crop.png";
 import userService from "../../services/userService";
@@ -235,12 +235,13 @@ const Register = () => {
                       }}
                     >
                       Alredy have an account ?{" "}
-                      <a
+                      <Link to="/" style={{ fontWeight: "bolder", paddingLeft: "10px" }}>Login!</Link>
+                      {/* <a
                         href="/"
                         style={{ fontWeight: "bolder", paddingLeft: "10px" }}
                       >
                         Login!
-                      </a>
+                      </a> */}
                     </div>
                   </Form.Item>
                 </Form>

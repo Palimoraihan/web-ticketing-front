@@ -24,7 +24,7 @@ import FilterComponent from "../../component/FilterComponent";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import ticketService from "../../services/ticketService";
 import userService from "../../services/userService";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import categoryService from "../../services/categoryService";
 import statusService from "../../services/statusServices";
 import priorityService from "../../services/priorityServices";
@@ -315,7 +315,8 @@ const Ticket = () => {
       title: "Subject",
       dataIndex: "subject",
       key: "subject",
-      render: (text, record) => <a href={`/ticket/${record.key}`}>{text}</a>,
+      render: (text, record) => <Link to={`/ticket/${record.key}`}>{text}</Link>
+      // <a href={`/ticket/${record.key}`}>{text}</a>,
     },
     {
       title: "Category",
