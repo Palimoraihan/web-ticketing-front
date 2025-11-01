@@ -6,7 +6,7 @@ import User from "../page/user/User";
 import NotFound from "../page/NotFound";
 import Ticket from "../page/ticket/Ticket";
 import Register from "../page/register/Register";
-import SettingsPage from "../page/settings/settings";
+import SettingsPage from "../page/settings/Settings";
 import MandatoryPage from "../page/mandatory/Mandatory";
 
 import Customer from "../page/customer/Customer";
